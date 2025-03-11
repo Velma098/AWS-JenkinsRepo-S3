@@ -1,17 +1,17 @@
 pipeline {
     agent any
     environment {
-        AWS_REGION = 'us-west-2' 
+        AWS_REGION = 'us-east-1' 
     }
     stages {
         stage('Set AWS Credentials') {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-credential' 
+                    credentialsId: 'Jenkins' 
                 ]]) {
                     sh '''
-                    echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
+                    echo ""
                     aws sts get-caller-identity
                     '''
                 }
@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/aaron-dm-mcdonald/jenkins-ec2.git' 
+                git branch: 'main', url: 'https://github.com/Velma098/AWS-JenkinsRepo-S3.git' 
             }
         }
         stage('Initialize Terraform') {
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-credential'
+                    credentialsId: 'Jenkins'
                 ]]) {
                     sh '''
                     export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
@@ -48,7 +48,7 @@ pipeline {
                 input message: "Approve Terraform Apply?", ok: "Deploy"
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-credential'
+                    credentialsId: 'Jenkins'
                 ]]) {
                     sh '''
                     export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
@@ -63,7 +63,7 @@ pipeline {
                 input message: "Do you want to destroy the infrastructure?", ok: "Destroy"
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-credential'
+                    credentialsId: 'Jenkins'
                 ]]) {
                     sh '''
                     export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
